@@ -1,0 +1,49 @@
+[package]
+name = "pydoc-gen"
+version = "0.1.0"
+edition = "2024"
+description = "Generate HTML documentation for Python from JavaDoc-style docstrings"
+license = "MIT"
+
+[dependencies]
+rustpython-parser = "0.4.0"
+
+[profile.release]
+lto = true
+
+[[test]]
+name = "unit_docstring"
+path = "tests/unit/docstring.rs"
+
+[[test]]
+name = "unit_edges"
+path = "tests/unit/edges.rs"
+
+[[test]]
+name = "unit_path"
+path = "tests/unit/path.rs"
+
+[[test]]
+name = "unit_tags"
+path = "tests/unit/tags.rs"
+
+[[test]]
+name = "contract_generate_docs"
+path = "tests/contract/generate_docs.rs"
+
+[[test]]
+name = "integration_invalid_input"
+path = "tests/integration/invalid_input.rs"
+
+[[test]]
+name = "integration_regeneration"
+path = "tests/integration/regeneration.rs"
+
+[[test]]
+name = "integration_navigation"
+path = "tests/integration/navigation.rs"
+
+[[bench]]
+name = "generate"
+harness = false
+path = "benches/generate.rs"

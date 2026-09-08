@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="color-scheme" content="light dark">
+<title>Index — pydoc-gen</title>
+<style>
+/*
+ * pydoc-gen default theme (FR-013).
+ *
+ * Authored as a real CSS file and bundled into the tool at build time.
+ * Hand-written only — no third-party CSS libraries or frameworks (FR-010).
+ *
+ * Design tokens: colors are the public override surface for user themes
+ * (see contracts/theme.md). Both light and dark palettes must keep body
+ * text at WCAG AA (>= 4.5:1) contrast (SC-003, SC-008).
+ */
+
+:root {
+    --color-bg: #ffffff;
+    --color-surface: #f4f6f8;
+    --color-text: #1a2533;
+    --color-muted: #49566b;
+    --color-accent: #1a56db;
+    --color-border: #d8dee6;
+    --color-code-bg: #f0f2f5;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --color-bg: #0f1720;
+        --color-surface: #16202b;
+        --color-text: #e6e9ee;
+        --color-muted: #9aa7b6;
+        --color-accent: #7cb3ff;
+        --color-border: #2b3746;
+        --color-code-bg: #16202b;
+    }
+}
+
+/* Base reset (expanded in User Story 1). */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: var(--color-bg);
+    color: var(--color-text);
+}
+</style>
+</head>
+<body>
+<h1>pydoc-gen documentation</h1>
+<h2>Root: demo</h2>
+<h2>Index</h2>
+<ul>
+<li><a href="demo.html#demo">demo</a> <span class="kind">Module</span>
+<ul>
+<li><a href="demo.html#demo.MyClass">demo.MyClass</a> <span class="kind">Class</span>
+<ul>
+<li><a href="demo.html#demo.MyClass.__init__">demo.MyClass.__init__</a> <span class="kind">Function</span>
+</li>
+<li><a href="demo.html#demo.MyClass.do_something">demo.MyClass.do_something</a> <span class="kind">Function</span>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<hr>
+
+</body>
+</html>

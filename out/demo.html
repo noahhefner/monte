@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="color-scheme" content="light dark">
+<title>demo — pydoc-gen</title>
+<style>
+/*
+ * pydoc-gen default theme (FR-013).
+ *
+ * Authored as a real CSS file and bundled into the tool at build time.
+ * Hand-written only — no third-party CSS libraries or frameworks (FR-010).
+ *
+ * Design tokens: colors are the public override surface for user themes
+ * (see contracts/theme.md). Both light and dark palettes must keep body
+ * text at WCAG AA (>= 4.5:1) contrast (SC-003, SC-008).
+ */
+
+:root {
+    --color-bg: #ffffff;
+    --color-surface: #f4f6f8;
+    --color-text: #1a2533;
+    --color-muted: #49566b;
+    --color-accent: #1a56db;
+    --color-border: #d8dee6;
+    --color-code-bg: #f0f2f5;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --color-bg: #0f1720;
+        --color-surface: #16202b;
+        --color-text: #e6e9ee;
+        --color-muted: #9aa7b6;
+        --color-accent: #7cb3ff;
+        --color-border: #2b3746;
+        --color-code-bg: #16202b;
+    }
+}
+
+/* Base reset (expanded in User Story 1). */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: var(--color-bg);
+    color: var(--color-text);
+}
+</style>
+</head>
+<body>
+<p class="nav"><a href="index.html">&larr; Index</a></p>
+<hr>
+<section>
+<h2 class="element" id="demo"><span class="kind">Module</span> demo</h2>
+<p class="path"><code>demo</code></p>
+<p class="undocumented">No documentation provided.</p>
+<section>
+<h3 class="element" id="demo.MyClass"><span class="kind">Class</span> demo.MyClass</h3>
+<p class="path"><code>demo.MyClass</code></p>
+<p class="description">A demo class.</p>
+<section>
+<h4 class="element" id="demo.MyClass.__init__"><span class="kind">Function</span> demo.MyClass.__init__</h4>
+<p class="path"><code>demo.MyClass.__init__</code></p>
+<p class="undocumented">No documentation provided.</p>
+</section>
+<section>
+<h4 class="element" id="demo.MyClass.do_something"><span class="kind">Function</span> demo.MyClass.do_something</h4>
+<p class="path"><code>demo.MyClass.do_something</code></p>
+<p class="description">Does something with a var.</p>
+<h4>Arguments</h4>
+<table>
+<tr><td><code>with_this_str</code></td><td>The string we&#39;re doing something with.</td></tr>
+</table>
+<h4>Returns</h4>
+<p>A much cooler string.</p>
+<h4>Raises</h4>
+<ul>
+<li><code>ValueError</code> — If you try to be cool.</li>
+</ul>
+</section>
+</section>
+</section>
+
+</body>
+</html>
