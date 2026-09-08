@@ -4,38 +4,36 @@
 
 use std::path::Path;
 
-use crate::error::{Error, Result};
+use crate::error::{Result};
 use crate::pipeline;
 use crate::theme::resolve_theme;
+use clap::Parser;
+use std::path::PathBuf;
+
+/// Documentation generator for Python
+#[derive(Parser, Debug)]
+#[command(version, about, long_about = None)]
+struct Args {
+    /// Directory with Python source code
+    input_dir: String,
+
+    /// Directory to place documentation in
+    output_dir: String,
+
+    /// Custom CSS for generated documentation
+    #[arg(short, long)]
+    theme_path: Option<PathBuf>,
+}
 
 /// Parse command-line arguments and run the pipeline.
 pub fn run() -> Result<()> {
-    let args: Vec<String> = std::env::args().collect();
+    let args = Args::parse();
 
-    if args.len() != 3 && args.len() != 5 {
-        return Err(Error::Message(
-            "usage: pydoc-gen <input_dir> <output_dir> [--theme <css filename>]"
-                .to_string(),
-        ));
-    }
+    let input = Path::new(&args.input_dir);
+    let output = Path::new(&args.output_dir);
 
-    let input = Path::new(&args[1]);
-    let output = Path::new(&args[2]);
+    let theme = resolve_theme(args.theme_path.as_deref())?;
 
-    let theme_path = if args.len() == 5 {
-        if args[3] != "--theme" {
-            return Err(Error::Message(
-                "usage: pydoc-gen <input_dir> <output_dir> [--theme <css filename>]"
-                    .to_string(),
-            ));
-        }
-
-        Some(Path::new(&args[4]))
-    } else {
-        None
-    };
-
-    let theme = resolve_theme(theme_path)?;
     let project = pipeline::build_project(input)?;
     pipeline::write_site(&project, output, &theme)?;
 

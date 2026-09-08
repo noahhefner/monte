@@ -123,7 +123,7 @@ mod tests {
         std::fs::write(&path, "   \n").unwrap();
 
         let theme = resolve_theme(Some(&path)).expect("empty resolves");
-        assert_eq!(theme.css, crate::style::default_theme_css() + "\n   \n");
+        assert_eq!(theme.css, crate::style::default_theme_css().to_owned() + "\n   \n");
 
         let _ = std::fs::remove_dir_all(&dir);
     }

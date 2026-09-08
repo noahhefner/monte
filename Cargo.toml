@@ -6,6 +6,7 @@ description = "Generate HTML documentation for Python from JavaDoc-style docstri
 license = "MIT"
 
 [dependencies]
+clap = { version = "4.6.6", features = ["derive"] }
 rustpython-parser = "0.4.0"
 
 [profile.release]

@@ -64,7 +64,7 @@ fn main() {
     for _ in 0..ITERATIONS {
         let _ = fs::remove_dir_all(&output);
         let start = Instant::now();
-        generate(&input, &output).expect("generate");
+        generate(&input, &output, None).expect("generate");
         times.push(start.elapsed());
     }
 
