@@ -9,7 +9,6 @@ use std::path::{Path, PathBuf};
 
 use crate::error::{Error, Result};
 use crate::extract;
-use crate::html;
 use crate::index;
 use crate::model::{DocumentedElement, DocumentedProject, ImportPath};
 use crate::parser;
@@ -52,6 +51,7 @@ pub fn write_site(
         .map_err(|e| Error::WriteOutput(output.display().to_string(), e))?;
 
     let mut written: Vec<String> = Vec::new();
+    
     write_file(
         output,
         "index.html",
@@ -59,15 +59,7 @@ pub fn write_site(
         &mut written,
     )?;
 
-    for module in &project.elements {
-        let page = index::page_file_path(&module.path);
-        write_file(
-            output,
-            &page,
-            &html::render_module_page(module, "index.html", &theme.css),
-            &mut written,
-        )?;
-    }
+    // TODO: Render pages for individual modules
 
     remove_stale_html(output, &written)
 }

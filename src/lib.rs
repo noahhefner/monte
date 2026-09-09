@@ -11,7 +11,6 @@ pub mod cli;
 pub mod docstring;
 pub mod error;
 pub mod extract;
-pub mod html;
 pub mod index;
 pub mod model;
 pub mod parser;

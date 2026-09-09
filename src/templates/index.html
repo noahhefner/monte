@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Python Docs" />
+    <title>Python Docs</title>
+
+    <style>
+        /* Default Styles */
+
+        :root {
+            --color-bg: #ffffff;
+            --color-surface: #f4f6f8;
+            --color-text: #1a2533;
+            --color-muted: #49566b;
+            --color-accent: #1a56db;
+            --color-border: #d8dee6;
+            --color-code-bg: #f0f2f5;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --color-bg: #0f1720;
+                --color-surface: #16202b;
+                --color-text: #e6e9ee;
+                --color-muted: #9aa7b6;
+                --color-accent: #7cb3ff;
+                --color-border: #2b3746;
+                --color-code-bg: #16202b;
+            }
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: var(--color-bg);
+            color: var(--color-text);
+        }
+
+    </style>
+</head>
+
+<body>
+
+    {% component render_element(element: map) %}
+        <li>
+            <a href="{{ element.path }}">
+                {{ element.path }}
+            </a>
+
+            <span class="kind">
+                {{ element.kind }}
+            </span>
+
+            {% if element.children %}
+                <ul>
+                    {% for child in element.children %}
+                        {{<render_element element={child} />}}
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </li>
+    {% endcomponent render_element %}
+
+    <main>
+        <h1>Python Docs</h1>
+
+        <ul>
+            {% for module in modules %}
+                {{<render_element element={module} />}}
+            {% endfor %}
+        </ul>
+    </main>
+
+</body>
+
+</html>
