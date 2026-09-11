@@ -29,17 +29,11 @@ impl From<&DocumentedElement> for TemplateElement {
 pub fn render_index(project: &DocumentedProject, styles: &str) -> String {
     let mut tera = Tera::default();
 
-    tera.add_raw_template(
-        "index.html",
-        include_str!("templates/index.html"),
-    )
-    .expect("failed to parse index template");
+    tera.add_raw_template("index.html", include_str!("templates/index.html"))
+        .expect("failed to parse index template");
 
-    let modules: Vec<TemplateElement> = project
-        .elements
-        .iter()
-        .map(TemplateElement::from)
-        .collect();
+    let modules: Vec<TemplateElement> =
+        project.elements.iter().map(TemplateElement::from).collect();
 
     let mut context = Context::new();
 

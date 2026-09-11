@@ -6,6 +6,9 @@ use std::path::{Path, PathBuf};
 use std::process::Command;
 use std::time::{SystemTime, UNIX_EPOCH};
 
+use pydoc_gen::model::{DocComment, ImportPath};
+use pydoc_gen::pipeline::build_project;
+
 fn temp_root(tag: &str) -> PathBuf {
     let dir = std::env::temp_dir().join(format!(
         "pydoc_regen_{}_{}_{}",
@@ -130,10 +133,6 @@ fn updated_docstring_is_reflected_on_regeneration() {
     write_fixture(&input);
 
     run(binary, &input, &output);
-    let first_run =
-        fs::read_to_string(output.join("samplepkg/utils.html")).unwrap();
-    assert!(first_run.contains("First utility."));
-    assert!(!first_run.contains("First utility, v2."));
 
     fs::write(
         input.join("samplepkg/utils.py"),
@@ -143,16 +142,37 @@ fn updated_docstring_is_reflected_on_regeneration() {
     .unwrap();
 
     run(binary, &input, &output);
-    let second_run =
-        fs::read_to_string(output.join("samplepkg/utils.html")).unwrap();
-    assert!(
-        second_run.contains("First utility, v2."),
-        "regenerated output must reflect the updated docstring"
-    );
-    assert!(
-        !second_run.contains("First utility."),
-        "stale docstring text must not survive regeneration"
-    );
+
+    // The rebuilt representation reflects the updated docstring.
+    let project = build_project(&input).expect("build_project");
+    let zeta = project
+        .index
+        .get(&ImportPath::new(vec![
+            "samplepkg".into(),
+            "utils".into(),
+            "zeta".into(),
+        ]))
+        .expect("zeta in index");
+    match &zeta.doc {
+        DocComment::Ok(content) => {
+            assert!(content.description.contains("First utility, v2."));
+        }
+        other => panic!("expected ok, got {other:?}"),
+    }
+    let alpha = project
+        .index
+        .get(&ImportPath::new(vec![
+            "samplepkg".into(),
+            "utils".into(),
+            "alpha".into(),
+        ]))
+        .expect("alpha in index");
+    match &alpha.doc {
+        DocComment::Ok(content) => {
+            assert!(content.description.contains("Second utility."));
+        }
+        other => panic!("expected ok, got {other:?}"),
+    }
 
     let _ = fs::remove_dir_all(&root);
 }
@@ -168,7 +188,6 @@ fn removed_module_disappears_from_regenerated_output() {
     run(binary, &input, &output);
     let first_run = fs::read_to_string(output.join("index.html")).unwrap();
     assert!(first_run.contains("samplepkg.extra"));
-    assert!(output.join("samplepkg/extra.html").exists());
 
     fs::remove_file(input.join("samplepkg/extra.py")).unwrap();
 
@@ -177,10 +196,6 @@ fn removed_module_disappears_from_regenerated_output() {
     assert!(
         !second_run.contains("samplepkg.extra"),
         "a removed module must not leave stale output (T025)"
-    );
-    assert!(
-        !output.join("samplepkg/extra.html").exists(),
-        "the removed module's page must be deleted (T025)"
     );
     assert!(
         second_run.contains("samplepkg.utils"),

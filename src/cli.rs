@@ -4,7 +4,7 @@
 
 use std::path::Path;
 
-use crate::error::{Result};
+use crate::error::Result;
 use crate::pipeline;
 use crate::theme::resolve_theme;
 use clap::Parser;

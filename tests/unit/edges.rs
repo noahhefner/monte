@@ -1,12 +1,12 @@
 //! T014a/T036 - Unit tests for edge cases: empty dir, no Python files,
-//! unrecognized tags, non-existent input path.
+//! non-existent input path.
 
 use std::fs;
 use std::path::PathBuf;
 
 use pydoc_gen::error::Error;
+use pydoc_gen::model::DocComment;
 use pydoc_gen::pipeline::build_project;
-use pydoc_gen::tags::{TagParseResult, parse_block};
 
 fn temp_dir(name: &str) -> PathBuf {
     let dir = std::env::temp_dir().join(format!(
@@ -44,20 +44,29 @@ fn directory_with_no_python_files_completes() {
 }
 
 #[test]
-fn unrecognized_tags_everywhere_still_parse() {
-    let lines = vec![
-        "@deprecated use other".to_string(),
-        "@author X".to_string(),
-        "Some description.".to_string(),
-    ];
-    match parse_block(&lines) {
-        TagParseResult::Ok(content) => {
-            assert!(content.description.contains("Some description."));
-            assert!(content.args.is_empty());
-            assert!(content.raises.is_empty());
-        }
-        other => panic!("expected ok, got {other:?}"),
-    }
+fn legacy_tag_docstring_is_an_error_not_a_panic() {
+    let input = temp_dir("legacytags");
+    fs::create_dir_all(&input).unwrap();
+    fs::write(
+        input.join("legacy.py"),
+        "def f():\n    \"\"\"@arg x  the input\n    \"\"\"\n    pass\n",
+    )
+    .unwrap();
+
+    let project = build_project(&input).expect("legacy tags do not crash");
+    let el = project
+        .elements
+        .iter()
+        .flat_map(|m| m.children.iter())
+        .find(|e| e.path.text().ends_with("f"))
+        .expect("function documented");
+    let doc = el.doc.clone();
+    assert!(
+        matches!(doc, DocComment::Error(_)),
+        "legacy tag docstring must be an error entry, got {doc:?}"
+    );
+
+    let _ = fs::remove_dir_all(&input);
 }
 
 #[test]

@@ -1,18 +1,19 @@
 # pydoc-gen
 
-Generate HTML documentation for Python source from JavaDoc-style docstrings.
+Generate HTML documentation for Python source from YAML docstrings.
 
 `pydoc-gen` scans a source directory, parses each `.py` file with
-[`rustpython_parser`](https://crates.io/crates/rustpython-parser), extracts
-JavaDoc-style tags from module/class/function docstrings, and writes a
+[`rustpython_parser`](https://crates.io/crates/rustpython-parser), interprets
+each module/class/function docstring as a YAML document, and writes a
 navigable HTML site.
 
 ## Features
 
 - **Docstring-only source**: documentation is read from Python docstrings
   (`"""..."""`); `#` comment blocks are ignored.
-- **Three tags**: `@arg <name> <description>`, `@return <description>`,
-  `@raises <exception> <description>`, plus free description text.
+- **Structured YAML**: `description`, `args`, `returns`, and `raises` keys
+  describe an element; docstrings written as plain prose (no mapping) become
+  description-only entries.
 - **Full-path identity**: every module, class, and function is identified by
   its full Python package import path, so duplicate simple names in
   different modules stay unambiguous (e.g. `pkg.a.Helper` vs `pkg.b.Helper`).
@@ -29,11 +30,19 @@ navigable HTML site.
 
 ```python
 def format_value(text):
-    """Formats text for display.
+    """
+    description: Formats text for display.
 
-    @arg text  The text to format.
-    @return    The formatted string.
-    @raises ValueError  Raised when text is empty.
+    args:
+      - name: text
+        description: The text to format.
+
+    returns:
+      description: The formatted string.
+
+    raises:
+      - type: ValueError
+        description: Raised when text is empty.
     """
     ...
 ```
@@ -68,11 +77,13 @@ cargo clippy --all-targets -- -D warnings
 
 ## Specification
 
-Design docs live in [`specs/001-pydoc-generator/`](specs/001-pydoc-generator/):
+Design docs live in [`specs/003-yaml-docstring-parsing/`](specs/003-yaml-docstring-parsing/):
 
-- [spec.md](specs/001-pydoc-generator/spec.md) - requirements and user stories
-- [contracts/docstring-syntax.md](specs/001-pydoc-generator/contracts/docstring-syntax.md)
-- [contracts/cli.md](specs/001-pydoc-generator/contracts/cli.md)
-- [data-model.md](specs/001-pydoc-generator/data-model.md)
-- [quickstart.md](specs/001-pydoc-generator/quickstart.md)
-- [bench-results.md](specs/001-pydoc-generator/bench-results.md)
+- [spec.md](specs/003-yaml-docstring-parsing/spec.md) - requirements and user stories
+- [contracts/docstring-syntax.md](specs/003-yaml-docstring-parsing/contracts/docstring-syntax.md)
+- [contracts/cli.md](specs/003-yaml-docstring-parsing/contracts/cli.md)
+- [data-model.md](specs/003-yaml-docstring-parsing/data-model.md)
+- [quickstart.md](specs/003-yaml-docstring-parsing/quickstart.md)
+
+Original design docs for the initial feature live in
+[`specs/001-pydoc-generator/`](specs/001-pydoc-generator/).

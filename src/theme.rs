@@ -50,9 +50,8 @@ pub fn resolve_theme(theme_path: Option<&Path>) -> Result<Theme> {
     match theme_path {
         None => Ok(Theme::default_theme()),
         Some(path) => {
-            let user_css = fs::read_to_string(path).map_err(|e| {
-                Error::ReadTheme(path.display().to_string(), e)
-            })?;
+            let user_css = fs::read_to_string(path)
+                .map_err(|e| Error::ReadTheme(path.display().to_string(), e))?;
             let mut css = crate::style::default_theme_css().to_string();
             css.push('\n');
             css.push_str(&user_css);
@@ -80,22 +79,15 @@ mod tests {
 
     #[test]
     fn custom_theme_is_appended_after_default() {
-        let dir = std::env::temp_dir().join(format!(
-            "pydoc_theme_{}",
-            std::process::id()
-        ));
+        let dir = std::env::temp_dir()
+            .join(format!("pydoc_theme_{}", std::process::id()));
         let _ = std::fs::remove_dir_all(&dir);
         std::fs::create_dir_all(&dir).unwrap();
         let path = dir.join("user.css");
         std::fs::write(&path, "/* marker */ .x { color: red; }\n").unwrap();
 
         let theme = resolve_theme(Some(&path)).expect("custom resolves");
-        assert_eq!(
-            theme.source,
-            ThemeSource::Custom {
-                path: path.clone()
-            }
-        );
+        assert_eq!(theme.source, ThemeSource::Custom { path: path.clone() });
         assert_eq!(
             theme.css,
             format!(
@@ -113,17 +105,18 @@ mod tests {
 
     #[test]
     fn empty_custom_theme_is_allowed() {
-        let dir = std::env::temp_dir().join(format!(
-            "pydoc_theme_empty_{}",
-            std::process::id()
-        ));
+        let dir = std::env::temp_dir()
+            .join(format!("pydoc_theme_empty_{}", std::process::id()));
         let _ = std::fs::remove_dir_all(&dir);
         std::fs::create_dir_all(&dir).unwrap();
         let path = dir.join("empty.css");
         std::fs::write(&path, "   \n").unwrap();
 
         let theme = resolve_theme(Some(&path)).expect("empty resolves");
-        assert_eq!(theme.css, crate::style::default_theme_css().to_owned() + "\n   \n");
+        assert_eq!(
+            theme.css,
+            crate::style::default_theme_css().to_owned() + "\n   \n"
+        );
 
         let _ = std::fs::remove_dir_all(&dir);
     }

@@ -39,9 +39,10 @@ fn create_project(root: &Path) {
         );
         for f in 0..FUNCTIONS_PER_MODULE {
             source.push_str(&format!(
-                "def func_{f}(a, b):\n    \"\"\"Function {f}.\n\n    \
-                 @arg a  First value.\n    @arg b  Second value.\n    \
-                 @return int  The sum.\n    \"\"\"\n    return a + b\n\n"
+                "def func_{f}(a, b):\n    \"\"\"\n    description: Function {f}.\n\n    \
+                 args:\n      - name: a\n        description: First value.\n      \
+                 - name: b\n        description: Second value.\n\n    \
+                 returns:\n      description: The sum.\n    \"\"\"\n    return a + b\n\n"
             ));
         }
         fs::write(dir.join(format!("mod{m}.py")), source).unwrap();

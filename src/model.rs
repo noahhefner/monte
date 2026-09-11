@@ -61,20 +61,20 @@ impl ElementKind {
     }
 }
 
-/// A single documented argument (`@arg`).
+/// A single documented argument (the `args` YAML key).
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ArgDoc {
     pub name: String,
     pub description: String,
 }
 
-/// A documented return value (`@return`).
+/// A documented return value (the `returns` YAML key).
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ReturnDoc {
     pub description: String,
 }
 
-/// A documented exception (`@raises`).
+/// A documented exception (the `raises` YAML key).
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct RaisesDoc {
     pub exception: String,

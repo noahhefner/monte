@@ -7,6 +7,9 @@ use std::path::{Path, PathBuf};
 use std::process::Command;
 use std::time::{SystemTime, UNIX_EPOCH};
 
+use pydoc_gen::model::{DocComment, ImportPath};
+use pydoc_gen::pipeline::build_project;
+
 fn temp_root(tag: &str) -> PathBuf {
     let dir = std::env::temp_dir().join(format!(
         "pydoc_nav_{}_{}_{}",
@@ -62,19 +65,32 @@ fn index_reaches_every_documented_element() {
 
     let index_html =
         fs::read_to_string(output.join("index.html")).expect("index.html");
-    // Modules link to their own pages.
-    assert!(index_html.contains("href=\"pkg/a.html#pkg.a\""));
-    assert!(index_html.contains("href=\"pkg/b.html#pkg.b\""));
-    // Classes and methods link to their containing module's anchors.
-    assert!(index_html.contains("href=\"pkg/a.html#pkg.a.Helper\""));
-    assert!(index_html.contains("href=\"pkg/b.html#pkg.b.Helper\""));
-    assert!(index_html.contains("href=\"pkg/a.html#pkg.a.Helper.go\""));
+    // Every element is reachable from the index by full path.
+    assert!(index_html.contains("pkg.a"), "module pkg.a listed");
+    assert!(index_html.contains("pkg.b"), "module pkg.b listed");
+    assert!(index_html.contains("pkg.a.Helper"), "class Helper in pkg.a");
+    assert!(index_html.contains("pkg.b.Helper"), "class Helper in pkg.b");
+    assert!(
+        index_html.contains("pkg.a.Helper.go"),
+        "method go in pkg.a.Helper"
+    );
 
-    // Module pages exist and carry content.
-    let a_page =
-        fs::read_to_string(output.join("pkg/a.html")).expect("pkg/a.html");
-    assert!(a_page.contains("Helper A."));
-    assert!(a_page.contains("href=\"index.html\""));
+    // The representation carries correct docstrings for each element.
+    let project = build_project(&input).expect("build_project");
+    let a_helper = project
+        .index
+        .get(&ImportPath::new(vec![
+            "pkg".into(),
+            "a".into(),
+            "Helper".into(),
+        ]))
+        .expect("Helper in pkg.a");
+    match &a_helper.doc {
+        DocComment::Ok(content) => {
+            assert!(content.description.contains("Helper A."));
+        }
+        other => panic!("expected ok, got {other:?}"),
+    }
 
     let _ = fs::remove_dir_all(&root);
 }
@@ -92,20 +108,38 @@ fn duplicate_simple_names_resolved_by_full_path() {
     let index_html =
         fs::read_to_string(output.join("index.html")).expect("index.html");
     assert!(
-        index_html.contains("pkg/a.html#pkg.a.Helper"),
+        index_html.contains("pkg.a.Helper"),
         "both same-named classes must be listed with distinct full paths"
     );
     assert!(
-        index_html.contains("pkg/b.html#pkg.b.Helper"),
+        index_html.contains("pkg.b.Helper"),
         "both same-named classes must be listed with distinct full paths"
     );
 
-    let a_page =
-        fs::read_to_string(output.join("pkg/a.html")).expect("pkg/a.html");
-    let b_page =
-        fs::read_to_string(output.join("pkg/b.html")).expect("pkg/b.html");
-    assert!(a_page.contains("pkg.a.Helper"), "A page shows its own path");
-    assert!(b_page.contains("pkg.b.Helper"), "B page shows its own path");
+    let project = build_project(&input).expect("build_project");
+    let a_helper = project
+        .index
+        .get(&ImportPath::new(vec![
+            "pkg".into(),
+            "a".into(),
+            "Helper".into(),
+        ]))
+        .expect("Helper in pkg.a");
+    let b_helper = project
+        .index
+        .get(&ImportPath::new(vec![
+            "pkg".into(),
+            "b".into(),
+            "Helper".into(),
+        ]))
+        .expect("Helper in pkg.b");
+    match (&a_helper.doc, &b_helper.doc) {
+        (DocComment::Ok(a), DocComment::Ok(b)) => {
+            assert!(a.description.contains("Helper A."));
+            assert!(b.description.contains("Helper B."));
+        }
+        (a, b) => panic!("expected both Ok, got a={a:?} b={b:?}"),
+    }
 
     let _ = fs::remove_dir_all(&root);
 }

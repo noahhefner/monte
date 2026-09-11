@@ -51,7 +51,7 @@ pub fn write_site(
         .map_err(|e| Error::WriteOutput(output.display().to_string(), e))?;
 
     let mut written: Vec<String> = Vec::new();
-    
+
     write_file(
         output,
         "index.html",
@@ -232,7 +232,7 @@ mod tests {
             .unwrap();
         fs::write(
             dir.join("pkg/mod.py"),
-            "def format_value(text):\n    \"\"\"Formatting helpers.\n\n    @arg text  The input.\n    @return str  Output.\n    \"\"\"\n    return text\n",
+            "def format_value(text):\n    \"\"\"\n    description: Formatting helpers.\n\n    args:\n      - name: text\n        description: The input.\n\n    returns:\n      description: Output.\n    \"\"\"\n    return text\n",
         )
         .unwrap();
 
